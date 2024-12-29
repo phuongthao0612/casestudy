@@ -85,24 +85,52 @@ public class CustomerController extends HttpServlet {
         int age = Integer.parseInt(req.getParameter("age"));
         String phone = req.getParameter("phone");
 
-        Customer newCustomer = new Customer(name, age, phone, email);
-        customerService.add(newCustomer);
+        Customer customer = new Customer(name, age, phone, email);
+        customerService.add(customer);
         resp.sendRedirect("/customer?message=created");
     }
 
     private static void updateCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String id = req.getParameter("id");
-        String updatedName = req.getParameter("updatedName");
-        String updatedEmail = req.getParameter("updatedEmail");
-        int updatedAge = Integer.parseInt(req.getParameter("updatedAge"));
-        String updatedPhone = req.getParameter("updatedPhone");
 
-        if (id != null) {
-            Customer updatedCustomer = new Customer(Integer.parseInt(id), updatedName, updatedAge, updatedPhone, updatedEmail);
-            customerService.update(updatedCustomer);
+        // Lấy thông tin mới từ form
+        String updatedName = req.getParameter("updatedName");
+        String updatedAge = req.getParameter("updatedAge");
+        String updatedPhone = req.getParameter("updatedPhone");
+        String updatedEmail = req.getParameter("updatedEmail");
+
+        // Kiểm tra nếu id không hợp lệ, chuyển hướng về danh sách khách hàng
+        if (id == null || updatedName == null) {
+            resp.sendRedirect("/customer");
+            return;
+        }
+
+        // Lấy đối tượng customer cũ từ database
+        Customer customer = customerService.getById(Integer.parseInt(id));
+        if (customer != null) {
+            // Cập nhật các thuộc tính nếu người dùng thay đổi
+            if (updatedName != null && !updatedName.isEmpty()) {
+                customer.setName(updatedName);  // Cập nhật tên
+            }
+            if (updatedAge != null && !updatedAge.isEmpty()) {
+                customer.setAge(Integer.parseInt(updatedAge));  // Cập nhật tuổi
+            }
+            if (updatedPhone != null && !updatedPhone.isEmpty()) {
+                customer.setPhone(updatedPhone);  // Cập nhật số điện thoại
+            }
+            if (updatedEmail != null && !updatedEmail.isEmpty()) {
+                customer.setEmail(updatedEmail);  // Cập nhật email
+            }
+
+            // Lưu thông tin đã cập nhật vào cơ sở dữ liệu
+            customerService.update(customer);
+
+            // Chuyển hướng về trang danh sách khách hàng với thông báo thành công
             resp.sendRedirect("/customer?message=updated");
         } else {
+            // Nếu không tìm thấy khách hàng, chuyển hướng về trang danh sách
             resp.sendRedirect("/customer");
         }
     }
+
 }

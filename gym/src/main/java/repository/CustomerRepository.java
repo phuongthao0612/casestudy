@@ -33,21 +33,21 @@ public class CustomerRepository {
     }
 
     public void add(Customer customer) {
-        String sql = "INSERT INTO customers (customer_name, age, phone, email) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement statement = BaseRepository.getConnection().
+                prepareStatement("insert into customers (customer_name, age, phone, email) values (?, ?, ?, ?)")) {
             statement.setString(1, customer.getName());
             statement.setInt(2, customer.getAge());
             statement.setString(3, customer.getPhone());
             statement.setString(4, customer.getEmail());
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     public void update(Customer customer) {
-        String sql = "UPDATE customers SET customer_name = ?, age = ?, phone = ?, email = ? WHERE id = ?";
-        try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement statement = BaseRepository.getConnection().
+                prepareStatement("update customers set customer_name = ?, age = ?, phone = ?, email = ? where customer_id = ?")) {
             statement.setString(1, customer.getName());
             statement.setInt(2, customer.getAge());
             statement.setString(3, customer.getPhone());
@@ -55,23 +55,24 @@ public class CustomerRepository {
             statement.setInt(5, customer.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     public void delete(int id) {
-        String sql = "DELETE FROM customers WHERE id = ?";
-        try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement statement = BaseRepository.getConnection().
+                prepareStatement("delete from customers where customer_id = ?")) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     public Customer getById(int id) {
-        String sql = "SELECT * FROM customers WHERE id = ?";
-        try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sql)) {
+        Customer customer = null;
+        try (PreparedStatement statement = BaseRepository.getConnection().
+                prepareStatement("select * from customers where customer_id = ?")) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -82,7 +83,7 @@ public class CustomerRepository {
                 return new Customer(id, name, age, phone, email);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return null;
     }
