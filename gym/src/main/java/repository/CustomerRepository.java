@@ -19,8 +19,8 @@ public class CustomerRepository {
                     .prepareStatement("select * from customers");
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
+                int id = resultSet.getInt("customer_id");
+                String name = resultSet.getString("customer_name");
                 int age = resultSet.getInt("age");
                 String phone = resultSet.getString("phone");
                 String email = resultSet.getString("email");
@@ -33,7 +33,7 @@ public class CustomerRepository {
     }
 
     public void add(Customer customer) {
-        String sql = "INSERT INTO customers (name, age, phone, email) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO customers (customer_name, age, phone, email) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sql)) {
             statement.setString(1, customer.getName());
             statement.setInt(2, customer.getAge());
@@ -46,7 +46,7 @@ public class CustomerRepository {
     }
 
     public void update(Customer customer) {
-        String sql = "UPDATE customers SET name = ?, age = ?, phone = ?, email = ? WHERE id = ?";
+        String sql = "UPDATE customers SET customer_name = ?, age = ?, phone = ?, email = ? WHERE id = ?";
         try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sql)) {
             statement.setString(1, customer.getName());
             statement.setInt(2, customer.getAge());
@@ -75,7 +75,7 @@ public class CustomerRepository {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                String name = resultSet.getString("name");
+                String name = resultSet.getString("customer_name");
                 int age = resultSet.getInt("age");
                 String phone = resultSet.getString("phone");
                 String email = resultSet.getString("email");
@@ -87,4 +87,4 @@ public class CustomerRepository {
         return null;
     }
 }
-}
+

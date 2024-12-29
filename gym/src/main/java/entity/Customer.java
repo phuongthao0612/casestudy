@@ -1,45 +1,20 @@
 package entity;
 
-public class Customer {
-    private int id;
-    private String name;
+public class Customer extends Person {
     private int age;
-    private String phone;
     private String email;
 
-    public Customer() {
-
-    }
-
     public Customer(int id, String name, int age, String phone, String email) {
-        this.id = id;
-        this.name = name;
+        super(id, name, phone);
         this.age = age;
-        this.phone = phone;
         this.email = email;
     }
 
     public Customer(String name, int age, String phone, String email) {
-        this.name = name;
+        super(name, phone);
         this.age = age;
-        this.phone = phone;
         this.email = email;
-    }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public int getAge() {
@@ -48,14 +23,6 @@ public class Customer {
 
     public void setAge(int age) {
         this.age = age;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public String getEmail() {
@@ -68,8 +35,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer [id=" + id + ", name=" + name + ", age=" + age + ", phone=" + phone
-                + ", email=" + email + "]";
+        return super.toString() + "Customer [age=" + age + ", email=" + email + "]";
     }
 
 }
