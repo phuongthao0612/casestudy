@@ -1,8 +1,11 @@
 package controller;
 
+import dto.CustomerDTO;
 import entity.Customer;
 import service.ICustomerService;
+import service.IGymClassService;
 import service.impl.CustomerService;
+import service.impl.GymClassService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +17,8 @@ import java.util.List;
 
 @WebServlet(name = "CustomerController", value = "/customer")
 public class CustomerController extends HttpServlet {
-    private static final ICustomerService customerService = new CustomerService();
+    private static ICustomerService customerService = new CustomerService();
+    private static IGymClassService gymClassService = new GymClassService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,6 +29,7 @@ public class CustomerController extends HttpServlet {
 
         switch (action) {
             case "create":
+                req.setAttribute("gymClasses", gymClassService.getAll());
                 req.getRequestDispatcher("WEB-INF/view/customer/create.jsp").forward(req, resp);
                 break;
             case "update":
@@ -34,7 +39,7 @@ public class CustomerController extends HttpServlet {
                 deleteCustomer(req, resp);
                 break;
             default:
-                List<Customer> customers = customerService.getAll();
+                List<CustomerDTO> customers = customerService.getAllDTO();
                 req.setAttribute("customers", customers);
                 req.getRequestDispatcher("WEB-INF/view/customer/list.jsp").forward(req, resp);
                 break;
@@ -81,54 +86,91 @@ public class CustomerController extends HttpServlet {
 
     private static void insertCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String name = req.getParameter("name");
-        String email = req.getParameter("email");
-        int age = Integer.parseInt(req.getParameter("age"));
-        String phone = req.getParameter("phone");
 
-        Customer customer = new Customer(name, age, phone, email);
+        // Kiểm tra nếu tham số "age" là null hoặc không phải là số hợp lệ
+        int age = 0;
+        String ageParam = req.getParameter("age");
+        if (ageParam != null && !ageParam.isEmpty()) {
+            try {
+                age = Integer.parseInt(ageParam);  // Chuyển đổi thành số nguyên
+            } catch (NumberFormatException e) {
+                // Xử lý lỗi nếu không thể chuyển đổi "age" thành số
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Age must be a valid number");
+                return;  // Dừng xử lý nếu có lỗi
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Age is required");
+            return;  // Dừng xử lý nếu "age" là null hoặc rỗng
+        }
+
+        String phone = req.getParameter("phone");
+        String email = req.getParameter("email");
+
+        // Kiểm tra tham số "idClass" và xử lý ngoại lệ nếu không hợp lệ
+        Integer idClass = null;
+        String idClassParam = req.getParameter("idClass");
+        if (idClassParam != null && !idClassParam.isEmpty()) {
+            try {
+                idClass = Integer.valueOf(idClassParam);  // Chuyển đổi thành số nguyên
+            } catch (NumberFormatException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "idClass must be a valid number");
+                return;  // Dừng xử lý nếu có lỗi
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "idClass is required");
+            return;  // Dừng xử lý nếu "idClass" là null hoặc rỗng
+        }
+
+        // Tạo đối tượng Customer và thêm vào dịch vụ
+        Customer customer = new Customer(name, age, phone, email, idClass);
         customerService.add(customer);
+
+        // Chuyển hướng sau khi thêm thành công
         resp.sendRedirect("/customer?message=created");
     }
 
+
+    /*private static void insertCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String name = req.getParameter("name");
+        int age = Integer.parseInt(req.getParameter("age"));
+        String phone = req.getParameter("phone");
+        String email = req.getParameter("email");
+        String className = req.getParameter("className");
+        Integer idClass = Integer.valueOf(req.getParameter("idClass"));
+        Customer customer = new Customer(name, age, phone, email, className, idClass);
+        customerService.add(customer);
+        resp.sendRedirect("/customer?message=created");
+    }*/
+
     private static void updateCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String id = req.getParameter("id");
-
-        // Lấy thông tin mới từ form
         String updatedName = req.getParameter("updatedName");
         String updatedAge = req.getParameter("updatedAge");
         String updatedPhone = req.getParameter("updatedPhone");
         String updatedEmail = req.getParameter("updatedEmail");
 
-        // Kiểm tra nếu id không hợp lệ, chuyển hướng về danh sách khách hàng
         if (id == null || updatedName == null) {
             resp.sendRedirect("/customer");
             return;
         }
 
-        // Lấy đối tượng customer cũ từ database
         Customer customer = customerService.getById(Integer.parseInt(id));
         if (customer != null) {
-            // Cập nhật các thuộc tính nếu người dùng thay đổi
             if (updatedName != null && !updatedName.isEmpty()) {
-                customer.setName(updatedName);  // Cập nhật tên
+                customer.setName(updatedName);
             }
             if (updatedAge != null && !updatedAge.isEmpty()) {
-                customer.setAge(Integer.parseInt(updatedAge));  // Cập nhật tuổi
+                customer.setAge(Integer.parseInt(updatedAge));
             }
             if (updatedPhone != null && !updatedPhone.isEmpty()) {
-                customer.setPhone(updatedPhone);  // Cập nhật số điện thoại
+                customer.setPhone(updatedPhone);
             }
             if (updatedEmail != null && !updatedEmail.isEmpty()) {
-                customer.setEmail(updatedEmail);  // Cập nhật email
+                customer.setEmail(updatedEmail);
             }
-
-            // Lưu thông tin đã cập nhật vào cơ sở dữ liệu
             customerService.update(customer);
-
-            // Chuyển hướng về trang danh sách khách hàng với thông báo thành công
             resp.sendRedirect("/customer?message=updated");
         } else {
-            // Nếu không tìm thấy khách hàng, chuyển hướng về trang danh sách
             resp.sendRedirect("/customer");
         }
     }

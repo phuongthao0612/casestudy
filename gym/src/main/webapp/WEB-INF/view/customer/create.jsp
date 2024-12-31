@@ -31,6 +31,14 @@
             <label for="email">Email:</label>
             <input type="text" class="form-control" id="email" name="email">
         </div>
+        <div class="form-group">
+            <label for="className">Class:</label>
+            <select class="form-control" id="className" name="idClass">
+                <c:forEach var="gymClass" items="${gymClasses}">
+                    <option value="${gymClass.classId}">${gymClass.className}</option>
+                </c:forEach>
+            </select>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
 
     </form>

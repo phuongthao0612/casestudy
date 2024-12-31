@@ -1,5 +1,6 @@
 package service.impl;
 
+import dto.CustomerDTO;
 import entity.Customer;
 import repository.CustomerRepository;
 import service.ICustomerService;
@@ -19,9 +20,13 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public void add(Customer customer) {
-        customerRepository.add(customer);
+        customerRepository.add(customer, customer.getIdClass());  // Thêm khách hàng và gắn lớp học
+    }
 
 
+    @Override
+    public List<CustomerDTO> getAllDTO() {
+        return customerRepository.getAllDTO();
     }
 
     @Override
@@ -38,6 +43,6 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public Customer getById(int id) {
-        return customerRepository.getById(id);
+        return null;
     }
 }

@@ -1,20 +1,22 @@
 package entity;
 
 public class Customer extends Person {
-    private int age;
+    int age;
     private String email;
+    private Integer idClass;
 
-    public Customer(int id, String name, int age, String phone, String email) {
+    public Customer(int id, String name, int age, String phone, String email, Integer idClass) {
         super(id, name, phone);
         this.age = age;
         this.email = email;
+        this.idClass = idClass;
     }
 
-    public Customer(String name, int age, String phone, String email) {
+    public Customer(String name, int age, String phone, String email, Integer idClass) {
         super(name, phone);
         this.age = age;
         this.email = email;
-
+        this.idClass = idClass;
     }
 
     public int getAge() {
@@ -31,6 +33,13 @@ public class Customer extends Person {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getIdClass() {
+        return idClass;
+    }
+    public void setIdClass(Integer idClass) {
+        this.idClass = idClass;
     }
 
     @Override

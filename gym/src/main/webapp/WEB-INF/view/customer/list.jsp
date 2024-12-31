@@ -24,7 +24,8 @@
             <th>Tuổi</th>
             <th>Điện Thoại</th>
             <th>Email</th>
-            <th colspan="2">Actions</th>
+            <th>Lớp</th>
+            <th colspan="2">Chức năng</th>
         </tr>
         </thead>
         <tbody>
@@ -35,6 +36,7 @@
                 <td>${customer.age}</td>
                 <td>${customer.phone}</td>
                 <td>${customer.email}</td>
+                <td>${customer.className}</td>
                 <td>
                     <button class="btn btn-warning"
                             onclick="window.location.href='/customer?action=update&id=${customer.id}'">Update

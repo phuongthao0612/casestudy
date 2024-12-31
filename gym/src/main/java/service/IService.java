@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface IService<T> {
     List<T> getAll();
-    void add(T t);
+    void add(T entity);
     void update(T t);
     void delete(int id);
 
