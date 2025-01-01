@@ -32,6 +32,18 @@
             <label for="updatedEmail">Email:</label>
             <input type="email" class="form-control" id="updatedEmail" name="updatedEmail" value="${customer.email}">
         </div>
+        <div class="form-group">
+            <label for="updatedClassId">Class:</label>
+            <select class="form-control" id="updatedClassId" name="updatedClassId">
+                <c:forEach var="gymClass" items="${gymClasses}">
+                    <option value="${gymClass.classId}"
+                        ${gymClass.classId == customer.idClass ? 'selected' : ''}>
+                            ${gymClass.className}
+                    </option>
+                </c:forEach>
+
+            </select>
+        </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>

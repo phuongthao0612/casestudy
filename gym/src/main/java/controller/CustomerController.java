@@ -2,6 +2,7 @@ package controller;
 
 import dto.CustomerDTO;
 import entity.Customer;
+import entity.GymClass;
 import service.ICustomerService;
 import service.IGymClassService;
 import service.impl.CustomerService;
@@ -51,11 +52,15 @@ public class CustomerController extends HttpServlet {
         if (id != null) {
             Customer customerToUpdate = customerService.getById(Integer.parseInt(id));
             req.setAttribute("customer", customerToUpdate);
+            List<GymClass> gymClasses = gymClassService.getAll();
+            req.setAttribute("gymClasses", gymClasses);
+
             req.getRequestDispatcher("WEB-INF/view/customer/update.jsp").forward(req, resp);
         } else {
             resp.sendRedirect("/customer");
         }
     }
+
 
     private static void deleteCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idToDelete = req.getParameter("id");
@@ -73,7 +78,6 @@ public class CustomerController extends HttpServlet {
         if (action == null) {
             action = "";
         }
-
         switch (action) {
             case "create":
                 insertCustomer(req, resp);
@@ -129,44 +133,25 @@ public class CustomerController extends HttpServlet {
         resp.sendRedirect("/customer?message=created");
     }
 
-
-    /*private static void insertCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String name = req.getParameter("name");
-        int age = Integer.parseInt(req.getParameter("age"));
-        String phone = req.getParameter("phone");
-        String email = req.getParameter("email");
-        String className = req.getParameter("className");
-        Integer idClass = Integer.valueOf(req.getParameter("idClass"));
-        Customer customer = new Customer(name, age, phone, email, className, idClass);
-        customerService.add(customer);
-        resp.sendRedirect("/customer?message=created");
-    }*/
-
     private static void updateCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String id = req.getParameter("id");
         String updatedName = req.getParameter("updatedName");
         String updatedAge = req.getParameter("updatedAge");
         String updatedPhone = req.getParameter("updatedPhone");
         String updatedEmail = req.getParameter("updatedEmail");
-
-        if (id == null || updatedName == null) {
+        String updatedClassId = req.getParameter("updatedClassId");
+        if (id == null || updatedName == null || updatedAge == null || updatedPhone == null || updatedEmail == null) {
             resp.sendRedirect("/customer");
             return;
         }
-
         Customer customer = customerService.getById(Integer.parseInt(id));
         if (customer != null) {
-            if (updatedName != null && !updatedName.isEmpty()) {
-                customer.setName(updatedName);
-            }
-            if (updatedAge != null && !updatedAge.isEmpty()) {
-                customer.setAge(Integer.parseInt(updatedAge));
-            }
-            if (updatedPhone != null && !updatedPhone.isEmpty()) {
-                customer.setPhone(updatedPhone);
-            }
-            if (updatedEmail != null && !updatedEmail.isEmpty()) {
-                customer.setEmail(updatedEmail);
+            customer.setName(updatedName);
+            customer.setAge(Integer.parseInt(updatedAge));
+            customer.setPhone(updatedPhone);
+            customer.setEmail(updatedEmail);
+            if (updatedClassId != null && !updatedClassId.isEmpty()) {
+                customer.setIdClass(Integer.parseInt(updatedClassId));
             }
             customerService.update(customer);
             resp.sendRedirect("/customer?message=updated");
@@ -174,5 +159,4 @@ public class CustomerController extends HttpServlet {
             resp.sendRedirect("/customer");
         }
     }
-
 }

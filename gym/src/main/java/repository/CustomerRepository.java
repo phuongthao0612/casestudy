@@ -26,7 +26,7 @@ public class CustomerRepository {
                 int age = resultSet.getInt("age");
                 String phone = resultSet.getString("phone");
                 String email = resultSet.getString("email");
- //               customers.add(new Customer(id, name, age, phone, email));
+                //               customers.add(new Customer(id, name, age, phone, email));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -63,18 +63,15 @@ public class CustomerRepository {
         String sqlEnrollment = "INSERT INTO enrollments (customer_id, class_id, registration_date) VALUES (LAST_INSERT_ID(), ?, ?)";
 
         try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(sqlCustomer)) {
-            // Thêm khách hàng vào bảng customers
             statement.setString(1, customer.getName());
             statement.setInt(2, customer.getAge());
             statement.setString(3, customer.getPhone());
             statement.setString(4, customer.getEmail());
-            statement.executeUpdate(); // Thêm khách hàng
-
-            // Thêm thông tin đăng ký vào bảng enrollments
+            statement.executeUpdate();
             try (PreparedStatement enrollmentStatement = BaseRepository.getConnection().prepareStatement(sqlEnrollment)) {
-                enrollmentStatement.setInt(1, classId);  // Đăng ký lớp học đã chọn
-                enrollmentStatement.setDate(2, Date.valueOf(java.time.LocalDate.now()));  // Ngày đăng ký
-                enrollmentStatement.executeUpdate(); // Thêm đăng ký lớp học
+                enrollmentStatement.setInt(1, classId);
+                enrollmentStatement.setDate(2, Date.valueOf(java.time.LocalDate.now()));
+                enrollmentStatement.executeUpdate();
             }
 
         } catch (SQLException e) {
@@ -82,16 +79,26 @@ public class CustomerRepository {
         }
     }
 
+    public void update(Customer customer, int newClassId) {
+        String updateCustomerSQL = "UPDATE customers SET customer_name = ?, age = ?, phone = ?, email = ? WHERE customer_id = ?";
+        String updateEnrollmentSQL = "UPDATE enrollments SET class_id = ? WHERE customer_id = ?";
 
-    public void update(Customer customer) {
-        try (PreparedStatement statement = BaseRepository.getConnection().
-                prepareStatement("update customers set customer_name = ?, age = ?, phone = ?, email = ? where customer_id = ?")) {
+        try (PreparedStatement statement = BaseRepository.getConnection().prepareStatement(updateCustomerSQL)) {
             statement.setString(1, customer.getName());
             statement.setInt(2, customer.getAge());
             statement.setString(3, customer.getPhone());
             statement.setString(4, customer.getEmail());
             statement.setInt(5, customer.getId());
             statement.executeUpdate();
+
+            // Nếu có thay đổi lớp học, cập nhật lớp học của khách hàng
+            if (newClassId != -1) {  // -1 là giá trị mặc định, nghĩa là không thay đổi lớp học
+                try (PreparedStatement enrollmentStatement = BaseRepository.getConnection().prepareStatement(updateEnrollmentSQL)) {
+                    enrollmentStatement.setInt(1, newClassId);
+                    enrollmentStatement.setInt(2, customer.getId());
+                    enrollmentStatement.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +114,7 @@ public class CustomerRepository {
         }
     }
 
-    /*public Customer getById(int id) {
+    public Customer getById(int id) {
         Customer customer = null;
         try (PreparedStatement statement = BaseRepository.getConnection().
                 prepareStatement("select * from customers where customer_id = ?")) {
@@ -118,12 +125,13 @@ public class CustomerRepository {
                 int age = resultSet.getInt("age");
                 String phone = resultSet.getString("phone");
                 String email = resultSet.getString("email");
-                return new Customer(id, name, age, phone, email);
+                Integer idClass = null;
+                customer = new Customer(id, name, age, phone, email, idClass);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
-    }*/
+        return customer;
+    }
 }
 

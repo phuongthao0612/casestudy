@@ -20,7 +20,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public void add(Customer customer) {
-        customerRepository.add(customer, customer.getIdClass());  // Thêm khách hàng và gắn lớp học
+        customerRepository.add(customer, customer.getIdClass());
     }
 
 
@@ -31,7 +31,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public void update(Customer customer) {
-        customerRepository.update(customer);
+        customerRepository.update(customer, customer.getIdClass());
 
     }
 
@@ -43,6 +43,7 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public Customer getById(int id) {
-        return null;
+        Customer customer = customerRepository.getById(id);
+        return customer;
     }
 }
