@@ -26,7 +26,7 @@ public class CustomerRepository {
                 int age = resultSet.getInt("age");
                 String phone = resultSet.getString("phone");
                 String email = resultSet.getString("email");
-                //               customers.add(new Customer(id, name, age, phone, email));
+        //        customers.add(new Customer(id, name, age, phone, email));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -90,9 +90,7 @@ public class CustomerRepository {
             statement.setString(4, customer.getEmail());
             statement.setInt(5, customer.getId());
             statement.executeUpdate();
-
-            // Nếu có thay đổi lớp học, cập nhật lớp học của khách hàng
-            if (newClassId != -1) {  // -1 là giá trị mặc định, nghĩa là không thay đổi lớp học
+            if (newClassId != -1) {
                 try (PreparedStatement enrollmentStatement = BaseRepository.getConnection().prepareStatement(updateEnrollmentSQL)) {
                     enrollmentStatement.setInt(1, newClassId);
                     enrollmentStatement.setInt(2, customer.getId());

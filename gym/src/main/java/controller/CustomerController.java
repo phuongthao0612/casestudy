@@ -90,46 +90,37 @@ public class CustomerController extends HttpServlet {
 
     private static void insertCustomer(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String name = req.getParameter("name");
-
-        // Kiểm tra nếu tham số "age" là null hoặc không phải là số hợp lệ
         int age = 0;
         String ageParam = req.getParameter("age");
         if (ageParam != null && !ageParam.isEmpty()) {
             try {
-                age = Integer.parseInt(ageParam);  // Chuyển đổi thành số nguyên
+                age = Integer.parseInt(ageParam);
             } catch (NumberFormatException e) {
-                // Xử lý lỗi nếu không thể chuyển đổi "age" thành số
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Age must be a valid number");
-                return;  // Dừng xử lý nếu có lỗi
+                resp.sendRedirect("errorPage.jsp?error=Age must be a valid number");
+                return;
             }
         } else {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Age is required");
-            return;  // Dừng xử lý nếu "age" là null hoặc rỗng
+            resp.sendRedirect("errorPage.jsp?error=Age is required");
+            return;
         }
 
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
-
-        // Kiểm tra tham số "idClass" và xử lý ngoại lệ nếu không hợp lệ
         Integer idClass = null;
         String idClassParam = req.getParameter("idClass");
         if (idClassParam != null && !idClassParam.isEmpty()) {
             try {
-                idClass = Integer.valueOf(idClassParam);  // Chuyển đổi thành số nguyên
+                idClass = Integer.valueOf(idClassParam);
             } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "idClass must be a valid number");
-                return;  // Dừng xử lý nếu có lỗi
+                resp.sendRedirect("errorPage.jsp?error=idClass must be a valid number");
+                return;
             }
         } else {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "idClass is required");
-            return;  // Dừng xử lý nếu "idClass" là null hoặc rỗng
+            resp.sendRedirect("errorPage.jsp?error=idClass is required");
+            return;
         }
-
-        // Tạo đối tượng Customer và thêm vào dịch vụ
         Customer customer = new Customer(name, age, phone, email, idClass);
         customerService.add(customer);
-
-        // Chuyển hướng sau khi thêm thành công
         resp.sendRedirect("/customer?message=created");
     }
 
